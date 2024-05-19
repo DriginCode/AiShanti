@@ -7,12 +7,31 @@ import { openai } from './openai.js'
 import { removeFile } from './utils.js'
 import { initCommand, processTextToChat, INITIAL_SESSION } from './logic.js'
 
+
 const bot = new Telegraf(config.get('TELEGRAM_TOKEN'))
 
 bot.use(session())
 
 bot.command('new', initCommand)
 bot.command('start', initCommand)
+
+bot.command('genimage', async (ctx) => {
+  const prompt = ctx.message.text.replace('/genimage', '').trim();
+  if (!prompt) {
+    await ctx.reply('Пожалуйста, предоставьте описание для генерации изображения. Например /genimage Сделай красивого кота');
+    return;
+  }
+  try {
+    await ctx.reply('Генерация изображения, пожалуйста, подождите...');
+    const imageUrl = await openai.generateImage(prompt);
+
+    await ctx.replyWithPhoto(imageUrl);
+  } catch (e) {
+    console.log('Error while generating image', e.message);
+    await ctx.reply('Произошла ошибка при генерации изображения. Попробуйте еще раз позже');
+  }
+});
+
 
 bot.on(message('voice'), async (ctx) => {
   ctx.session ??= INITIAL_SESSION

@@ -22,6 +22,7 @@ renderer.codespan = (text) => `<code>${text}</code>`;
 renderer.strong = (text) => `<b>${text}</b>`;
 renderer.em = (text) => `<i>${text}</i>`;
 renderer.del = (text) => `<s>${text}</s>`;
+renderer.html = (html) => html.replace(/<br\s*\/?>/gi, '\n'); // Убираем <br> теги
 
 marked.setOptions({
   renderer,
