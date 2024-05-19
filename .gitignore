@@ -3,5 +3,5 @@ node_modules
 config/default.json
 config/production.json
 vscode
-package-lock.json
 package.json
+package-lock.json
