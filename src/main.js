@@ -12,13 +12,11 @@ const bot = new Telegraf(config.get('TELEGRAM_TOKEN'))
 bot.use(session())
 
 bot.command('new', initCommand)
-
 bot.command('start', initCommand)
 
 bot.on(message('voice'), async (ctx) => {
   ctx.session ??= INITIAL_SESSION
   try {
-    // await ctx.reply(code('Сообщение принял. Жду ответ от сервера...'))
     await ctx.telegram.sendChatAction(ctx.chat.id, 'typing')
     const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id)
     const userId = String(ctx.message.from.id)
@@ -30,21 +28,22 @@ bot.on(message('voice'), async (ctx) => {
     removeFile(mp3Path)
 
     await ctx.reply(code(`Ваш запрос: ${text}`))
-
     await processTextToChat(ctx, text)
   } catch (e) {
     console.log(`Error while voice message`, e.message)
+    await ctx.reply('Произошла ошибка при обработке голосового сообщения.')
   }
 })
 
 bot.on(message('text'), async (ctx) => {
   ctx.session ??= INITIAL_SESSION
   try {
-    // await ctx.reply(code('Сообщение принял. Жду ответ от сервера...'))
     await ctx.telegram.sendChatAction(ctx.chat.id, 'typing')
     await processTextToChat(ctx, ctx.message.text)
+
   } catch (e) {
-    console.log(`Error while voice message`, e.message)
+    console.log(`Error while processing text message`, e.message)
+    await ctx.reply('Произошла ошибка при обработке текстового сообщения.')
   }
 })
 
