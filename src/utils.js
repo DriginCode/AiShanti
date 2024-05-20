@@ -24,6 +24,11 @@ renderer.em = (text) => `<i>${text}</i>`;
 renderer.del = (text) => `<s>${text}</s>`;
 renderer.html = (html) => html.replace(/<br\s*\/?>/gi, '\n'); // Убираем <br> теги
 
+// Новый рендерер для нераспознанных тегов
+renderer.html = (html) => {
+  return html.replace(/<\/?[^>]+(>|$)/g, ""); // Удаляем все HTML теги
+};
+
 marked.setOptions({
   renderer,
   gfm: true,
