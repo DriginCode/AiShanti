@@ -26,6 +26,7 @@ renderer.html = (html) => html.replace(/<br\s*\/?>/gi, '\n'); // Убираем 
 
 // Новый рендерер для нераспознанных тегов
 renderer.html = (html) => {
+  console.log("Удаление нераспознанных тегов:", html); // Отладочная информация
   return html.replace(/<\/?[^>]+(>|$)/g, ""); // Удаляем все HTML теги
 };
 
@@ -37,6 +38,13 @@ marked.setOptions({
   smartypants: true,
 });
 
+// Рабочая функция
+// export function convertMarkdownToHTML(text) {
+//   return marked(text);
+// }
+
 export function convertMarkdownToHTML(text) {
-  return marked(text);
+  const sanitizedText = marked(text);
+  console.log("Результат после обработки:", sanitizedText); // Отладочная информация
+  return sanitizedText;
 }

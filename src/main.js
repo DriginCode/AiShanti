@@ -56,7 +56,7 @@ bot.command('genimage', async (ctx) => {
     await decrementMessageCount(userId); // Уменьшаем счетчик после успешной генерации изображения
   } catch (e) {
     console.log('Error while generating image', e.message);
-    await ctx.reply('Произошла ошибка при генерации изображения. Попробуйте еще раз позже.');
+    await ctx.reply('Произошла ошибка при генерации изображения. Попробуйте еще раз позже.', e.message);
   }
 });
 
@@ -83,7 +83,7 @@ bot.on(message('voice'), async (ctx) => {
     await decrementMessageCount(userId); // Уменьшаем счетчик после успешной обработки голосового сообщения
   } catch (e) {
     console.log(`Error while voice message`, e.message);
-    await ctx.reply('Произошла ошибка при обработке голосового сообщения.');
+    await ctx.reply('Произошла ошибка при обработке голосового сообщения.', e.message);
   }
 });
 
@@ -101,7 +101,7 @@ bot.on(message('text'), async (ctx) => {
     await decrementMessageCount(userId); // Уменьшаем счетчик после успешной обработки текстового сообщения
   } catch (e) {
     console.log(`Error while processing text message`, e.message);
-    await ctx.reply('Произошла ошибка при обработке текстового сообщения.');
+    await ctx.reply('Произошла ошибка при обработке текстового сообщения.', e.message);
   }
 });
 
