@@ -13,6 +13,7 @@ const bot = new Telegraf(config.get('TELEGRAM_TOKEN'));
 bot.use(session());
 
 bot.command('new', initCommand);
+
 bot.command('start', initCommand);
 
 bot.command('adduser', async (ctx) => {
@@ -104,6 +105,7 @@ bot.on(message('text'), async (ctx) => {
     await ctx.reply('Произошла ошибка при обработке текстового сообщения.', e.message);
   }
 });
+
 
 bot.launch();
 

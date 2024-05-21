@@ -9,50 +9,40 @@ export async function removeFile(path) {
   }
 }
 
+
 // Настройка кастомного рендерера для marked
 const renderer = new marked.Renderer();
 
-renderer.paragraph = (text) => text + '\n'; // Убираем <p> теги и добавляем новую строку
-renderer.heading = (text, level) => `<b><u>${text}</u></b>\n`; // Заголовки
-renderer.list = (body, ordered) => body; // Обрабатываем тело списка без тегов <ol> или <ul>
-renderer.listitem = (text) => `• ${text}\n`; // Используем маркер списка
+renderer.paragraph = (text) => text + '\n';
+renderer.heading = (text, level) => `<b><u>${text}</u></b>\n`;
+renderer.list = (body, ordered) => body;
+renderer.listitem = (text) => `• ${text}\n`;
 renderer.link = (href, title, text) => `<a href="${href}">${text}</a>`;
 renderer.blockquote = (quote) => `<blockquote>${quote}</blockquote>`;
 renderer.codespan = (text) => `<code>${text}</code>`;
 renderer.strong = (text) => `<b>${text}</b>`;
 renderer.em = (text) => `<i>${text}</i>`;
 renderer.del = (text) => `<s>${text}</s>`;
-renderer.hr = () => '\n---\n'; // Заменяем <hr> теги на строку из трех дефисов
+renderer.hr = () => '\n---\n';
 
-// Новый рендерер для <br> тегов
-renderer.html = (html) => {
-  if (/<br\s*\/?>/gi.test(html)) {
-    console.log("Обработка <br> тега:", html); // Отладочная информация
-    return html.replace(/<br\s*\/?>/gi, '\n'); // Заменяем <br> теги на \n
-  }
-  console.log("Удаление нераспознанных тегов:", html); // Отладочная информация
-  return html.replace(/<\/?[^>]+(>|$)/g, ""); // Удаляем все остальные HTML теги
-};
+// Функция для удаления нераспознанных тегов и замены <br> тегов
+function sanitizeMarkdown(text) {
+  console.log("Sanitizing text:", text);
+  return text.replace(/<br\s*\/?>/gi, '\n\n') // Заменяем <br> теги на \n
+}
 
 marked.setOptions({
   renderer,
   gfm: true,
   breaks: false,
-  sanitize: true,
+  sanitize: false, // Снимаем sanitize, чтобы мы могли контролировать процесс
   smartypants: true,
 });
 
 // Функция для конвертации Markdown в HTML с дополнительной отладочной информацией
 export function convertMarkdownToHTML(text) {
-  const sanitizedText = marked(text);
+  console.log("Исходный текст:", text);
+  const sanitizedText = sanitizeMarkdown(marked(text));
   console.log("Результат после обработки:", sanitizedText); // Отладочная информация
   return sanitizedText;
 }
-
-
-// Рабочая функция
-// export function convertMarkdownToHTML(text) {
-//   return marked(text);
-// }
-
-
