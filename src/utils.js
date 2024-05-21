@@ -1,11 +1,11 @@
-import { unlink } from 'fs/promises'
+import { unlink } from 'fs/promises';
 import { marked } from 'marked';
 
 export async function removeFile(path) {
   try {
-    await unlink(path)
+    await unlink(path);
   } catch (e) {
-    console.log('Error while removing file', e.message)
+    console.log('Error while removing file', e.message);
   }
 }
 
@@ -23,6 +23,7 @@ renderer.strong = (text) => `<b>${text}</b>`;
 renderer.em = (text) => `<i>${text}</i>`;
 renderer.del = (text) => `<s>${text}</s>`;
 renderer.html = (html) => html.replace(/<br\s*\/?>/gi, '\n'); // Убираем <br> теги
+renderer.hr = () => '---'; // Обрабатываем <hr> тег как строку из трех дефисов
 
 // Новый рендерер для нераспознанных тегов
 renderer.html = (html) => {
@@ -38,13 +39,17 @@ marked.setOptions({
   smartypants: true,
 });
 
-// Рабочая функция
-// export function convertMarkdownToHTML(text) {
-//   return marked(text);
-// }
-
+// Функция для конвертации Markdown в HTML с дополнительной отладочной информацией
 export function convertMarkdownToHTML(text) {
   const sanitizedText = marked(text);
   console.log("Результат после обработки:", sanitizedText); // Отладочная информация
   return sanitizedText;
 }
+
+
+// Рабочая функция
+// export function convertMarkdownToHTML(text) {
+//   return marked(text);
+// }
+
+
