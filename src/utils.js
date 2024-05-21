@@ -27,6 +27,7 @@ renderer.hr = () => '\n---\n'; // Заменяем <hr> теги на строк
 // Новый рендерер для <br> тегов
 renderer.html = (html) => {
   if (/<br\s*\/?>/gi.test(html)) {
+    console.log("Обработка <br> тега:", html); // Отладочная информация
     return html.replace(/<br\s*\/?>/gi, '\n'); // Заменяем <br> теги на \n
   }
   console.log("Удаление нераспознанных тегов:", html); // Отладочная информация
