@@ -22,13 +22,15 @@ renderer.codespan = (text) => `<code>${text}</code>`;
 renderer.strong = (text) => `<b>${text}</b>`;
 renderer.em = (text) => `<i>${text}</i>`;
 renderer.del = (text) => `<s>${text}</s>`;
-renderer.html = (html) => html.replace(/<br\s*\/?>/gi, '\n'); // Убираем <br> теги
-renderer.hr = () => '\n---\n'; // Обрабатываем <hr> тег как строку из трех дефисов
+renderer.hr = () => '\n---\n'; // Заменяем <hr> теги на строку из трех дефисов
 
-// Новый рендерер для нераспознанных тегов
+// Новый рендерер для <br> тегов
 renderer.html = (html) => {
+  if (/<br\s*\/?>/gi.test(html)) {
+    return html.replace(/<br\s*\/?>/gi, '\n'); // Заменяем <br> теги на \n
+  }
   console.log("Удаление нераспознанных тегов:", html); // Отладочная информация
-  return html.replace(/<\/?[^>]+(>|$)/g, ""); // Удаляем все HTML теги
+  return html.replace(/<\/?[^>]+(>|$)/g, ""); // Удаляем все остальные HTML теги
 };
 
 marked.setOptions({
