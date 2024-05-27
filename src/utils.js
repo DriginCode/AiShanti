@@ -4,14 +4,14 @@ import { marked } from 'marked';
 // Настройка кастомного рендерера для marked
 const renderer = new marked.Renderer();
 
-renderer.paragraph = (text) => text + '\n';
-renderer.heading = (text, level) => `<b><u>${text}</u></b>\n`;
+renderer.paragraph = (text) => text + '\n\n';
+renderer.heading = (text, level) => `<b><u>${text}</u></b>\n\n`;
 renderer.list = (body, ordered) => body;
 renderer.listitem = (text) => `• ${text}\n`;
 renderer.link = (href, title, text) => `<a href="${href}">${text}</a>`;
 renderer.blockquote = (quote) => `<blockquote>${quote}</blockquote>`;
 renderer.codespan = (text) => `<code>${text}</code>`;
-renderer.strong = (text) => `<b>${text}</b>`;
+renderer.strong = (text) => `\n<b>${text}</b>`;
 renderer.em = (text) => `<i>${text}</i>`;
 renderer.del = (text) => `<s>${text}</s>`;
 renderer.hr = () => '\n---\n';
