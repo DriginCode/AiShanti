@@ -1,15 +1,6 @@
 import { unlink } from 'fs/promises';
 import { marked } from 'marked';
 
-export async function removeFile(path) {
-  try {
-    await unlink(path);
-  } catch (e) {
-    console.log('Error while removing file', e.message);
-  }
-}
-
-
 // Настройка кастомного рендерера для marked
 const renderer = new marked.Renderer();
 
@@ -27,8 +18,7 @@ renderer.hr = () => '\n---\n';
 
 // Функция для удаления нераспознанных тегов и замены <br> тегов
 function sanitizeMarkdown(text) {
-  console.log("Sanitizing text:", text);
-  return text.replace(/<br\s*\/?>/gi, '\n\n') // Заменяем <br> теги на \n
+  return text.replace(/<br\s*\/?>/gi, '\n\n'); // Заменяем <br> теги на \n
 }
 
 marked.setOptions({
@@ -39,10 +29,35 @@ marked.setOptions({
   smartypants: true,
 });
 
-// Функция для конвертации Markdown в HTML с дополнительной отладочной информацией
+// Функция для конвертации Markdown в HTML
 export function convertMarkdownToHTML(text) {
-  console.log("Исходный текст:", text);
   const sanitizedText = sanitizeMarkdown(marked(text));
-  console.log("Результат после обработки:", sanitizedText); // Отладочная информация
   return sanitizedText;
+}
+
+// Функция для повторных попыток запросов
+export async function fetchWithRetry(fetchFunction, args, ctx, retries = 3, delay = 1000) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fetchFunction(...args);
+    } catch (error) {
+      console.log(`Attempt ${attempt} failed: ${error.message}`);
+      if (attempt < retries) {
+        await new Promise(res => setTimeout(res, delay));
+      } else {
+        // Уведомление администратора в случае, если все попытки неудачны
+        await ctx.telegram.sendMessage(YOUR_TELEGRAM_USER_ID, `Ошибка после ${retries} попыток: ${error.message}`);
+        throw error;
+      }
+    }
+  }
+}
+
+// Функция для удаления файла
+export async function removeFile(path) {
+  try {
+    await unlink(path);
+  } catch (e) {
+    console.log('Error while removing file', e.message);
+  }
 }

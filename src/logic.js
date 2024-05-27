@@ -1,6 +1,5 @@
 import { openai } from './openai.js';
-import { convertMarkdownToHTML } from './utils.js';
-
+import { convertMarkdownToHTML, fetchWithRetry } from './utils.js';
 
 export const INITIAL_SESSION = {
   messages: [],
@@ -15,7 +14,7 @@ export async function processTextToChat(ctx, content) {
   try {
     ctx.session.messages.push({ role: openai.roles.USER, content });
 
-    const response = await openai.chat(ctx.session.messages);
+    const response = await fetchWithRetry(openai.chat, [ctx.session.messages], ctx, 3, 1000);
 
     ctx.session.messages.push({
       role: openai.roles.ASSISTANT,
