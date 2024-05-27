@@ -46,7 +46,7 @@ export async function fetchWithRetry(fetchFunction, args, ctx, retries = 3, dela
         await new Promise(res => setTimeout(res, delay));
       } else {
         // Уведомление администратора в случае, если все попытки неудачны
-        await ctx.telegram.sendMessage(YOUR_TELEGRAM_USER_ID, `Ошибка после ${retries} попыток: ${error.message}`);
+        await ctx.telegram.sendMessage(377484655, `Ошибка после ${retries} попыток: ${error.message}`);
         throw error;
       }
     }
