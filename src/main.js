@@ -4,7 +4,7 @@ import { code } from 'telegraf/format';
 import config from 'config';
 import { ogg } from './ogg.js';
 import { openai } from './openai.js';
-import { removeFile } from './utils.js';
+import { removeFile, convertMarkdownToHTML } from './utils.js';
 import { initCommand, processTextToChat, INITIAL_SESSION } from './logic.js';
 import { checkAccess, addUser, removeUser, decrementMessageCount } from './access.js';
 
@@ -13,7 +13,6 @@ const bot = new Telegraf(config.get('TELEGRAM_TOKEN'));
 bot.use(session());
 
 bot.command('new', initCommand);
-
 bot.command('start', initCommand);
 
 bot.command('adduser', async (ctx) => {
@@ -57,7 +56,7 @@ bot.command('genimage', async (ctx) => {
     await decrementMessageCount(userId); // Уменьшаем счетчик после успешной генерации изображения
   } catch (e) {
     console.log('Error while generating image', e.message);
-    await ctx.reply('Произошла ошибка при генерации изображения. Попробуйте еще раз позже.', e.message);
+    await ctx.reply('Произошла ошибка при генерации изображения. Попробуйте еще раз позже.');
   }
 });
 
@@ -83,8 +82,8 @@ bot.on(message('voice'), async (ctx) => {
     await processTextToChat(ctx, text);
     await decrementMessageCount(userId); // Уменьшаем счетчик после успешной обработки голосового сообщения
   } catch (e) {
-    console.log(`Error while voice message`, e.message);
-    await ctx.reply('Произошла ошибка при обработке голосового сообщения.', e.message);
+    console.log('Error while voice message', e.message);
+    await ctx.reply('Произошла ошибка при обработке голосового сообщения.');
   }
 });
 
@@ -101,11 +100,10 @@ bot.on(message('text'), async (ctx) => {
     await processTextToChat(ctx, ctx.message.text);
     await decrementMessageCount(userId); // Уменьшаем счетчик после успешной обработки текстового сообщения
   } catch (e) {
-    console.log(`Error while processing text message`, e.message);
-    await ctx.reply('Произошла ошибка при обработке текстового сообщения.', e.message);
+    console.log('Error while processing text message', e.message);
+    await ctx.reply('Произошла ошибка при обработке текстового сообщения.');
   }
 });
-
 
 bot.launch();
 

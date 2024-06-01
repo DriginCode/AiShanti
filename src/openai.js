@@ -1,74 +1,79 @@
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import config from 'config';
 import { createReadStream } from 'fs';
 
 const SYSTEM_PROMPT = config.get('AI_SHANTI_SYSTEM_PROMPT');
 
-
-//Класс для работы с OpenAI API.
-class OpenAI {
+class OpenAIWrapper {
   roles = {
     ASSISTANT: 'assistant',
     USER: 'user',
     SYSTEM: 'system',
   };
 
-  //* Создает экземпляр OpenAI.
   constructor(apiKey) {
-    const configuration = new Configuration({
-      apiKey,
-    });
-    this.openai = new OpenAIApi(configuration);
+    this.client = new OpenAI({ apiKey });
   }
 
-  //* Отправляет сообщения в модель GPT-3.5-turbo и получает ответ.
   async chat(messages) {
     try {
-      const response = await this.openai.createChatCompletion({
+      const response = await this.client.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
-          ...messages
+          ...messages,
         ],
       });
-      return response.data.choices[0].message;
+      if (response && response.choices && response.choices[0] && response.choices[0].message) {
+        return response.choices[0].message.content;
+      } else {
+        throw new Error('Invalid response structure from OpenAI');
+      }
     } catch (e) {
       console.log('Error while gpt chat', e.message);
+      throw new Error('Failed to communicate with OpenAI API');
     }
   }
 
-  //* Создает текстовую транскрипцию из аудиофайла.
   async transcription(filepath) {
     try {
-      const response = await this.openai.createTranscription(
-        createReadStream(filepath),
-        'whisper-1'
-      );
-      return response.data.text;
+      const response = await this.client.audio.transcriptions.create({
+        file: createReadStream(filepath),
+        model: 'whisper-1',
+      });
+      if (response && response.text) {
+        return response.text;
+      } else {
+        throw new Error('Invalid response structure from OpenAI');
+      }
     } catch (e) {
       console.log('Error while transcription', e.message);
+      throw new Error('Failed to transcribe audio');
     }
   }
 
-  // Генерирует изображение на основе текстового описания.
   async generateImage(prompt) {
     try {
-      console.log('Generating image with prompt:', prompt);
-      const response = await this.openai.createImage({
-        model: 'dall-e-3',
+      const response = await this.client.images.create({
         prompt,
         n: 1,
         size: '1024x1024',
       });
-      // console.log('API response:', response);
-      //console.log('API response data:', response.data);
-      //console.log('Generated image URL:', response.data.data[0].url);
-      return response.data.data[0].url;
+      if (response && response.data && response.data[0] && response.data[0].url) {
+        return response.data[0].url;
+      } else {
+        throw new Error('Invalid response structure from OpenAI');
+      }
     } catch (e) {
       console.log('Error while generating image', e.message);
-      throw new Error('Failed to generate image.');
+      throw new Error('Failed to generate image');
     }
   }
 }
 
-export const openai = new OpenAI(config.get('OPENAI_KEY'));
+const apiKey = config.get('OPENAI_KEY');
+if (!apiKey) {
+  throw new Error('OPENAI_KEY is not set in the configuration');
+}
+
+export const openai = new OpenAIWrapper(apiKey);

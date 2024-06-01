@@ -14,14 +14,14 @@ export async function processTextToChat(ctx, content) {
   try {
     ctx.session.messages.push({ role: openai.roles.USER, content });
 
-    const response = await fetchWithRetry(openai.chat, [ctx.session.messages], ctx, 3, 1000);
+    const responseContent = await fetchWithRetry(openai.chat.bind(openai), [ctx.session.messages], ctx, 3, 1000);
 
     ctx.session.messages.push({
       role: openai.roles.ASSISTANT,
-      content: response.content,
+      content: responseContent,
     });
 
-    const convertedContent = convertMarkdownToHTML(response.content);
+    const convertedContent = convertMarkdownToHTML(responseContent);
     await ctx.reply(convertedContent, { parse_mode: 'HTML' });
   } catch (e) {
     console.log('Error while processing text to gpt', e.message);
